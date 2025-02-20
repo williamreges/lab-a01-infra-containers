@@ -1,0 +1,128 @@
+version: '3.8'
+
+services:
+
+  service-mysqldb:
+    image: mysql
+    restart: no
+    environment:
+      MYSQL_DATABASE: 'payment-db'
+      MYSQL_USER: 'user'
+      MYSQL_PASSWORD: 'password'
+      MYSQL_ROOT_PASSWORD: 'password'
+    ports:
+      - '3306:3306'
+    networks:
+      - lab-a01-network
+
+  zipkin-server:
+    image: openzipkin/zipkin
+    ports:
+      - 9411:9411
+    networks:
+      - lab-a01-network
+
+  service-app-service-registry:
+    image: williamreges/lab-a01-infra-service-registry
+    ports:
+      - '8761:8761'
+    environment:
+      EUREKA_CLIENT_REGISTER_WITH_EUREKA: false
+      EUREKA_CLIENT_FETCH_REGISTRY: false
+    networks:
+      - lab-a01-network
+
+  service-app-repository-payment:
+    image: williamreges/lab-a01-app-repository-payment
+    restart: on-failure
+    ports:
+      - '8000:8000'
+    networks:
+      - lab-a01-network
+    environment:
+      EUREKA_CLIENT_ENABLED: true
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://service-app-service-registry:8761/eureka
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin-server:9411/api/v2/spans
+      SPRING_CLOUD_CONFIG_ENABLED: false
+      SPRING_JPA_SHOW_SQL: true
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_DATASOURCE_URL: jdbc:mysql://service-mysqldb:3306/payment-db?allowPublicKeyRetrieval=true&useSSL=false
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_FLYWAY_URL: jdbc:mysql://service-mysqldb:3306/
+      SPRING_FLYWAY_SCHEMAS: payment-db
+      SPRING_FLYWAY_USER: root
+      SPRING_FLYWAY_PASSWORD: password
+    depends_on:
+      - service-mysqldb
+      - service-app-service-registry
+
+  service-app-bff-payment:
+    image: williamreges/lab-a01-app-bff-payment
+    restart: no
+    ports:
+      - '8100:8100'
+    networks:
+      - lab-a01-network
+    environment:
+      EUREKA_CLIENT_ENABLED: true
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://service-app-service-registry:8761/eureka
+      SPRING_CLOUD_CONFIG_ENABLED: false
+      NAME_SERVICE_REPOSITORY: app-repository-payment
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin-server:9411/api/v2/spans
+    depends_on:
+      - service-app-service-registry
+      - service-app-repository-payment
+
+  service-app-gateway:
+    image: williamreges/lab-a01-app-gateway
+    restart: no
+    ports:
+      - '8765:8765'
+    networks:
+      - lab-a01-network
+    environment:
+      EUREKA_CLIENT_ENABLED: true
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://service-app-service-registry:8761/eureka
+      SPRING_CLOUD_CONFIG_ENABLED: false
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin-server:9411/api/v2/spans
+    depends_on:
+      - service-app-service-registry
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    networks:
+      - lab-a01-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "9090:9090"
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+      - './prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro'
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    networks:
+      - lab-a01-network
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_HOST_PROMETHEUS=http://prometheus:9090
+    volumes:
+      - './grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards'
+      - './grafana/provisioning/datasources:/etc/grafana/provisioning/datasources'
+      - './grafana/grafana.ini:/etc/grafana/grafana.ini'
+    depends_on:
+      - prometheus
+
+networks:
+  lab-a01-network:
+    driver: bridge
+
