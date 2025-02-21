@@ -13,13 +13,16 @@ e [Spring Cloud](https://spring.io/cloud).
 Essa stack apenas exemplifica a execução de um sistema de pagamentos que utiliza operações CRUD.
 
 ### 📋 Pré-requisitos
+
 * Docker e Docker Compose
 
 ### 🔧 Instalação
 
-Tem varia maneiras de instalação do docker em seu pc tanto para Windows como [Docker Desktop](https://docs.docker.com/desktop/) 
-quanto para Linux como [Docker Engineer](https://docs.docker.com/engine/). Porém a maneira que fiz nesse projeto foi 
-utilizar a ferramenta `Snap` da distribuição Linux Ubuntu onde o mesmo ja instala o docker quanto do docker-compose conforme
+Tem varia maneiras de instalação do docker em seu pc tanto para Windows
+como [Docker Desktop](https://docs.docker.com/desktop/)
+quanto para Linux como [Docker Engineer](https://docs.docker.com/engine/). Porém a maneira que fiz nesse projeto foi
+utilizar a ferramenta `Snap` da distribuição Linux Ubuntu onde o mesmo ja instala o docker quanto do docker-compose
+conforme
 exemplo abaixo:
 
 ```bash
@@ -27,6 +30,7 @@ exemplo abaixo:
 ```
 
 ---
+
 ## 🖥️ Stack da Docker-Compose
 
 A stack de imagens no [docker-compose](docker-compose.yml) é constituido dos seguintes projetos e imagens:
@@ -46,15 +50,21 @@ A stack de imagens no [docker-compose](docker-compose.yml) é constituido dos se
 
 ## ⚙️ Executando Ambiente
 
+### Rode o ambiente
+
+Faça clone do projeto:
+
+```bash
+  git clone https://github.com/williamreges/lab-a01-infra-containers.git
+```
 
 Execute o seguinte comando no arquivo [docker-compose.yml](docker-compose.yml) dentro da pasta do arquivo:
 
-### Rode o ambiente
 ```bash
   docker compose up -d
 ```
-Será mostrado logs parecido como demonstrado abaixo mostrando que o docker compose executou as imagens com sucesso:
 
+Será mostrado logs parecido como demonstrado abaixo mostrando que o docker compose executou as imagens com sucesso:
 
 ![img.png](doc/images/img001.png)
 
@@ -62,17 +72,18 @@ Já o comando ```docker compose ps``` mostra todos os containers rodando:
 
 ![img.png](doc/images/img006.png)
 
-
 ### Veja os Logs
 
 Para ver os logs do ambiente via console tem duas maneiras:
 
 * Todos os logs em tempo real com o comando:
+
 ```bash
   docker compose logs --follow
 ```
 
 * logs em tempo real específico de um serviço com o comando:
+
 ```bash
   docker compose logs --follow service-app-repository-payment
 ```
@@ -82,17 +93,22 @@ Para ver os logs do ambiente via console tem duas maneiras:
 Para parar os serviços existe algumas formas:
 
 * Todos os serviços da Stack estarão `Stopped`. Ou seja, mantem os containeres apenas parados com o comando:
+
 ```bash
   docker compose stop
 ```
+
 Será mostrado logs parecido como demonstrado abaixo mostrando que o docker compose executou o comando com sucesso:
 ![img.png](doc/images/img000.png)
 
-* Todods os serviços da stack estarão como `Removed`. Ou seja, seus recursos como containeres, imagens, volumes e networks
-serão removidos com o comando:
+* Todods os serviços da stack estarão como `Removed`. Ou seja, seus recursos como containeres, imagens, volumes e
+  networks
+  serão removidos com o comando:
+
 ```bash
   docker compose down
 ```
+
 Será mostrado logs parecido como demonstrado abaixo mostrando que o docker compose executou o comando com sucesso:
 
 ![img.png](doc/images/img002.png)
@@ -102,16 +118,17 @@ Será mostrado logs parecido como demonstrado abaixo mostrando que o docker comp
 ## ⌨️ Executando os testes
 
 Para testar as operações CRUD na aplicação vamos utilizar chamadas REST nos endpoints. Aqui nesse teste iremos chamar os
-endpoints do Gateway `service-app-gateway` que por sua vez irá fazer requisições em cascata tudo integrado com 
-os recursos do Spring Cloud dentro do docker-compose. Exemplo: 
+endpoints do Gateway `service-app-gateway` que por sua vez irá fazer requisições em cascata tudo integrado com
+os recursos do Spring Cloud dentro do docker-compose. Exemplo:
 
 ***service-app-gateway -> service-app-bff-payment -> service-app-repository-payment -> mysql***.
 
 > **Observacão:**
-> 
-> Se desejar testar suas requisições via Postaman ou Insomnia importe as collections que estão em 
+>
+> Se desejar testar suas requisições via Postaman ou Insomnia importe as collections que estão em
 > [doc/collections](./doc/collections)
 >
+
 ### Testando Gateway
 
 Execute o seguinte comando:
@@ -119,28 +136,29 @@ Execute o seguinte comando:
 ```bash
   curl -request GET --url http://localhost:8765/get
 ```
-Se retorna algum json como no exemplo abaixo significa que o Gateway está pronto para receber requisições REST.
 
+Se retorna algum json como no exemplo abaixo significa que o Gateway está pronto para receber requisições REST.
 
 ```json
 {
-   "args": {},
-   "headers": {
-      "Accept": "*/*",
-      "Content-Length": "0",
-      "Forwarded": "proto=http;host=\"localhost:8765\";for=\"172.18.0.1:37268\"",
-      "Hello": "World",
-      "Host": "httpbin.org",
-      "Range": "bytes=equest",
-      "Traceparent": "00-67b8f5849d4e502f4c151cad5f6e64f4-9170105b4373be32-01",
-      "User-Agent": "curl/8.5.0",
-      "X-Amzn-Trace-Id": "Root=1-67b8f585-57692a3c645f84ea0bc4d09c",
-      "X-Forwarded-Host": "localhost:8765"
-   },
-   "origin": "172.18.0.1, 191.178.195.171",
-   "url": "http://localhost:8765/get"
+  "args": {},
+  "headers": {
+    "Accept": "*/*",
+    "Content-Length": "0",
+    "Forwarded": "proto=http;host=\"localhost:8765\";for=\"172.18.0.1:37268\"",
+    "Hello": "World",
+    "Host": "httpbin.org",
+    "Range": "bytes=equest",
+    "Traceparent": "00-67b8f5849d4e502f4c151cad5f6e64f4-9170105b4373be32-01",
+    "User-Agent": "curl/8.5.0",
+    "X-Amzn-Trace-Id": "Root=1-67b8f585-57692a3c645f84ea0bc4d09c",
+    "X-Forwarded-Host": "localhost:8765"
+  },
+  "origin": "172.18.0.1, 191.178.195.171",
+  "url": "http://localhost:8765/get"
 }
 ```
+
 ### POST - Gerar Pagamento PIX
 
 Para testar uma requisição de operação de pagamento via PIX através do Gateway execute a seguinte requisição:
@@ -158,11 +176,12 @@ Para testar uma requisição de operação de pagamento via PIX através do Gate
 	"mensagemTransacao":" PIX para compra de carro"
 }'
 ```
+
 Será retornado um hash que simula o `ID da Transação` feito com exito. Exemplo: `9c96dc20-a2de-4b12-b651-e2ed8c82737b`
 
 ### GET - Obtem um Pagamento PIX por ID da Transação
 
-Com o hash obtido podemos obter o registro do PIX feito anteriormente conforme exemplo abaixo. 
+Com o hash obtido podemos obter o registro do PIX feito anteriormente conforme exemplo abaixo.
 
 ```bash
 curl --request GET \
@@ -174,18 +193,19 @@ E com isso logo será retornado algo parecido com esse body abaixo:
 
 ```json
 {
-   "codigoTrancacao":"9c96dc20-a2de-4b12-b651-e2ed8c82737b",
-   "codigoPessoa":"fbc5fbc7-9b55-4058-af41-fa94ae092ae8",
-   "valorTrancacao":2500.5,
-   "dataTrancacao":"2025-02-03T13:00:00",
-   "codigoBeneficiario":"02d807e5-dd29-4a25-9de7-a621209c28b7",
-   "mensagemTransacao":" PIX para compra de carro"
+  "codigoTrancacao": "9c96dc20-a2de-4b12-b651-e2ed8c82737b",
+  "codigoPessoa": "fbc5fbc7-9b55-4058-af41-fa94ae092ae8",
+  "valorTrancacao": 2500.5,
+  "dataTrancacao": "2025-02-03T13:00:00",
+  "codigoBeneficiario": "02d807e5-dd29-4a25-9de7-a621209c28b7",
+  "mensagemTransacao": " PIX para compra de carro"
 }
 ```
 
 ### PUT - Atualiza um Pagamento PIX por ID da Transação
 
-Embora não exista como atualizar uma transação, mas como fim de estudo inseri esse recurso nesse projeto. Execute a seguinte
+Embora não exista como atualizar uma transação, mas como fim de estudo inseri esse recurso nesse projeto. Execute a
+seguinte
 requisição abaixo editando qualquer atributo. Nesse exemplo mudei a `mensagemTransacao` e `valorTrancacao`:
 
 ```bash
@@ -216,7 +236,8 @@ curl --request DELETE \
 
 ## 📈 Abrindo as Ferramentas no Browser
 
-As ferramentas como Grafana, Zikping e Eureka podem ser abertos pelo browser depois que o docker compose estiver em execução
+As ferramentas como Grafana, Zikping e Eureka podem ser abertos pelo browser depois que o docker compose estiver em
+execução
 
 1. Acesse o Grafana e acompanhe as métricas que a ferramenta obtitem do Prometheus pelo link http://localhost:3000
 
