@@ -47,7 +47,7 @@ A stack de imagens no [docker-compose](docker-compose.yml) é constituido dos se
 ## ⚙️ Executando Ambiente
 
 
-Execute o seguinte comando no arquivo [docker-compose.yml](docker-compose.yml) dentro da pasta do arquivo:**
+Execute o seguinte comando no arquivo [docker-compose.yml](docker-compose.yml) dentro da pasta do arquivo:
 
 1. **Rode o ambiente**
 ```bash
@@ -75,11 +75,33 @@ Para ver os logs do ambiente via console tem duas maneiras:
 
 Para parar os serviços existe algumas formas:
 
+* Todos os serviços da Stack estarão `Stopped` mantendo os containeres sem execução com o comando:
+```bash
+  docker compose stop
+```
+Será mostrado logs parecido como demonstrado abaixo mostrando que o docker compose executou o comando com sucesso:
+![img.png](img.png)
+
 * Todods os serviços da stack serão parados e seus recursos como containeres, imagens, volumes e networks
 serão removidos com o comando:
 ```bash
   docker compose down
 ```
-Será mostrado logs parecido como demonstrado abaixo mostrando que o docker compose executou as imagens com sucesso:
+Será mostrado logs parecido como demonstrado abaixo mostrando que o docker compose executou o comando com sucesso:
 
 ![img.png](doc/image002.png)
+
+---
+
+## 📈 Abrindo as Ferramentas no Browser
+
+As ferramentas como Grafana, Zikping e Eureka podem ser abertos pelo browser depois que o docker compose estiver em execução
+
+1. Acesse o Grafana e acompanhe as métricas que a ferramenta obtitem do Prometheus pelo link http://localhost:3000
+
+![img_1.png](img_1.png)
+
+2. Acesse o Prometheus pelo link http://localhost:9090 e veja as métricas que o prometheus obtém das aplicações 
+através de scraps:
+
+![img_2.png](img_2.png)
