@@ -234,7 +234,7 @@ curl --request DELETE \
   --header 'User-Agent: insomnia/10.3.0'
 ```
 
-## 📈 Abrindo as Ferramentas no Browser
+## 📈 Observability
 
 As ferramentas como Grafana, Zikping e Eureka podem ser abertos pelo browser depois que o docker compose estiver em
 execução
